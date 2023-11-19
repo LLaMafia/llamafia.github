@@ -13,6 +13,12 @@ LLaMafia 关注最扎实的工程和最前沿的科学，所有讨论基于第�
 * RNN 类模型
 * 涌现能力的原理，小模型可以吗？
 
+[20231022](https://github.com/LLaMafia/llamafia.github/blob/main/Log/compression.md) Compression Theory
+* Arithmetic Coding 算法
+* 语言模型是无损压缩器
+* 压缩得越好，模型越有可能恢复数据的生成过程
+* 为什么智能是一种副产物：过度优化的问题
+
 ## Contact
 
 llamafia.agi@gmail.com
