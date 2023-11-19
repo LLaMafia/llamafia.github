@@ -4,7 +4,7 @@ LLaMafia 是一个中文前沿 AI / LLM 开源讨论空间。LLaMa 指 [LLaMA �
 
 LLaMafia 关注最扎实的工程和最前沿的科学，所有讨论基于第一性原理和第一手经验，鼓励 critical thinking, promote insightful work
 
-## Log
+## Tech Log
 [20231119](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231119.md)
 * Learning Rate 和 Batch Size 的关系
 * 多机多卡并行方案
