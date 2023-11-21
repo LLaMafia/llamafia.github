@@ -4,6 +4,10 @@ LLaMafia 是一个中文前沿 AI / LLM 开源讨论空间。LLaMa 指 [LLaMA �
 
 LLaMafia 关注最扎实的工程和最前沿的科学，所有讨论基于第一性原理和第一手经验，鼓励 critical thinking, promote insightful work
 
+在当下的时代，人们学习和研究 AI 的原因有很多种，可以是追求产品价值，投资机会，学术资源，社会影响力等。
+
+LLaMafia 研究 AI，是因为纯粹的热爱。
+
 ## Tech Log
 [20231119](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231119.md)
 * Learning Rate 和 Batch Size 的关系
