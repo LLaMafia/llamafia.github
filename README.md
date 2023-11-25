@@ -9,6 +9,12 @@ LLaMafia 关注最扎实的工程和最前沿的科学，所有讨论基于第�
 LLaMafia 研究 AI，是因为纯粹的热爱
 
 ## Tech Log
+[20231125](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231125.md)
+* 对 AI Safety / AI open source 以及 large scale AI deployment 的看法
+* 轻量方法动态压缩序列
+* 论文分享：1. Transformer升级之路：15、Key归一化助力长度外推 2. Component-Wise Gradient Norm Clipping 3. Superalignment 4. Detecting Pretraining Data from Large Language Models
+* 讨论： 1. 召回向量 & RAG 2. Claude 2.1上下文信息提取能力 3.Medusa 框架 & lookahead decoding 4. LLM局域信息
+
 [20231119](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231119.md)
 * Learning Rate 和 Batch Size 的关系
 * 多机多卡并行方案
