@@ -9,7 +9,7 @@ LLaMafia 关注最扎实的工程和最前沿的科学，所有讨论基于第�
 LLaMafia 研究 AI，是因为纯粹的热爱
 
 ## Tech Log
-[20231203](https://github.com/HU-xiaobai/llamafia.github/blob/main/Log/20231203.md)
+[20231203](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231203.md)
 * 数字切开验证&&数字计算
 * Instruction following 能力
 * 论文分析：1.《我在Performer中发现了Transformer-VQ的踪影》2.Multimodal understanding benchmark!
