@@ -9,6 +9,12 @@ LLaMafia 关注最扎实的工程和最前沿的科学，所有讨论基于第�
 LLaMafia 研究 AI，是因为纯粹的热爱
 
 ## Tech Log
+[20231203](https://github.com/HU-xiaobai/llamafia.github/blob/main/Log/20231203.md)
+* 数字切开验证&&数字计算
+* Instruction following 能力
+* 论文分析：1.《我在Performer中发现了Transformer-VQ的踪影》2.Multimodal understanding benchmark!
+* 讨论：1.LLama2 预测结果不一致 2.LLama 的 tokenizer 和 titoken 本质区别 3.特定的domain用self-instruct 的效果 4.大模型SFT阶段训练不稳定的探索
+
 [20231125](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231125.md)
 * 对 AI Safety / AI open source 以及 large scale AI deployment 的看法
 * 轻量方法动态压缩序列
