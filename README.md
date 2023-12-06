@@ -29,6 +29,13 @@ LLaMafia 研究 AI，是因为纯粹的热爱
 * RNN 类模型
 * 涌现能力的原理，小模型可以吗？
 
+[20231112](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231112.md)
+* 为什么大模型普遍选用更宽而不是更高的模型架构
+* 如何实现知识更新
+* 复读机问题的原因与解决
+* 关于LLM外推
+* 位数越多GPT的加法正确率越低
+
 [20231022](https://github.com/LLaMafia/llamafia.github/blob/main/Log/compression.md) Compression Theory. [讨论录像](https://ed-ac-uk.zoom.us/rec/play/AcFcfuRIJXqjEkoIClzmtZQcN88n5vnwRZmkYB2Lr8R8PPPGFabyfvpj4NyaDlvNt87dP0PmVi9WNEqw.Fm5W6IqIWmmiPIYA?canPlayFromShare=true&from=share_recording_detail&continueMode=true&componentName=rec-play&originRequestUrl=https://ed-ac-uk.zoom.us/rec/share/zxLddFhtjkKkpyqHHvb9kvU34UGqmDpPU_N4OJ7OOaTZl6ek57DASt6OrcEorATt.CPq6Omm-oTt3K4hT)
 * Arithmetic Coding 算法
 * 语言模型是无损压缩器
