@@ -12,11 +12,11 @@ LLaMafia 研究 AI，是因为纯粹的热爱
 
 [20231210](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231210.md)
 
-* MOE Evaluation时的capacity
-* 模型外推
-* LLM self-generating training data
-* Loss形状与训练数据的顺序的关系
-* Mixtral讨论
+* MoE Evaluation: 讨论了在MoE模型评估中关于capacity设置的影响与策略。
+* LLM外推能力: 模型在处理长文本和代码方面的外推能力及其局限性。
+* 自生成训练数据: 模型自我生成训练数据的方法、效果及潜在偏差。
+* 损失函数形状: 训练数据顺序对大型模型训练中损失函数形状的影响。
+* Mixtral和其他模型讨论: Mixtral-8x7b模型的性能、显存需求和推理速度，以及其他相关模型的讨论。
 * 论文分析：1.运用在医药领域，构建提示让通用模型战胜专用模型的方法。2. RLCD，用positive/negative prompts生成data，这样data自动有pos/neg labels，然后train reward models。3.天工开源150B中文预训练语料。4. Medical LLM的survey report
 * 讨论：1.grad norm的解释。2.文字顺序不影响gpt理解。3. 4090 做多机多卡 pretrain。4. mamba（线性复杂度序列模型）讨论。5. apple 发的新机器学习框架测试。6. window attention，rnn实用性。7. alignment阶段模型学习了什么
 
