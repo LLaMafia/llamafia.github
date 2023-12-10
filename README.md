@@ -9,6 +9,13 @@ LLaMafia 关注最扎实的工程和最前沿的科学，所有讨论基于第�
 LLaMafia 研究 AI，是因为纯粹的热爱
 
 ## Tech Log
+[20231210](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231210.md)
+* MoE Evaluation: 讨论了在MoE模型评估中关于capacity设置的影响与策略。
+* LLM外推能力: 模型在处理长文本和代码方面的外推能力及其局限性
+* 自生成训练数据: 模型自我生成训练数据的方法、效果及潜在偏差
+* 损失函数形状: 训练数据顺序对大型模型训练中损失函数形状的影响
+* Mixtral和其他模型讨论: Mixtral-8x7b模型的性能、显存需求和推理速度，以及其他相关模型的讨论
+
 [20231203](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231203.md)
 * 数字切开验证&&数字计算
 * Instruction following 能力
