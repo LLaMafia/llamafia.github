@@ -9,7 +9,19 @@ LLaMafia 关注最扎实的工程和最前沿的科学，所有讨论基于第�
 LLaMafia 研究 AI，是因为纯粹的热爱
 
 ## Tech Log
+
+[20231210](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231210.md)
+
+* MOE Evaluation时的capacity
+* 模型外推
+* LLM self-generating training data
+* Loss形状与训练数据的顺序的关系
+* Mixtral讨论
+* 论文分析：1.运用在医药领域，构建提示让通用模型战胜专用模型的方法。2. RLCD，用positive/negative prompts生成data，这样data自动有pos/neg labels，然后train reward models。3.天工开源150B中文预训练语料。4. Medical LLM的survey report
+* 讨论：1.grad norm的解释。2.文字顺序不影响gpt理解。3. 4090 做多机多卡 pretrain。4. mamba（线性复杂度序列模型）讨论。5. apple 发的新机器学习框架测试。6. window attention，rnn实用性。7. alignment阶段模型学习了什么
+
 [20231203](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231203.md)
+
 * 数字切开验证&&数字计算
 * Instruction following 能力
 * 论文分析：1.《我在Performer中发现了Transformer-VQ的踪影》2.Multimodal understanding benchmark!
