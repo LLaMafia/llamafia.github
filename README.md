@@ -9,6 +9,12 @@ LLaMafia 关注最扎实的工程和最前沿的科学，所有讨论基于第�
 LLaMafia 研究 AI，是因为纯粹的热爱
 
 ## Tech Log
+
+[20231213](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231213.md) 蒸馏方法的局限与 MOE [讨论录像](https://drive.google.com/file/d/11CSgSzk4XCz4Mj7jh1wu0CPpzrDLASnI/view)
+* 当下 self-distill 方法的局限
+* 为什么很少有 LLM soft-distll
+* MOE 与 contiune training（见录像）
+
 [20231210](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231210.md)
 * MoE Evaluation: 讨论了在MoE模型评估中关于capacity设置的影响与策略。
 * LLM外推能力: 模型在处理长文本和代码方面的外推能力及其局限性
