@@ -1,0 +1,9 @@
+# Distill 方法目前的局限
+
+1. 对于 self-instruct 以及目前各式的 distill 方法，这些方法确实能做，但是上限受到质疑；似乎即便是 self-isntruct，也会引入人类的先验知识来进行 filter，所以总归是很难完成真正的模型 self-improve；
+2. distill 导致的 overfit 明显，但是尚且没有工作体现了 overfit 会 converge，猜测是有极限的；
+3. 传统的 soft-distill 做的人越来越少，一方面是 openai 等等公司没开放 hidden states 和 logits，很难去 distill；另一方面，在工程上直接去 imitate logits 的难度非常高，现在 deepspeed 等等框架都没有实现这件事情，这也导致了大家倾向于 distill data 而不是 logits。
+
+## 回放录像
+
+https://drive.google.com/file/d/11CSgSzk4XCz4Mj7jh1wu0CPpzrDLASnI/view?usp=sharing
