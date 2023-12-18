@@ -9,6 +9,10 @@ LLaMafia 关注最扎实的工程和最前沿的科学，所有讨论基于第�
 LLaMafia 研究 AI，是因为纯粹的热爱
 
 ## Tech Log
+[20231217](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231217.md)
+* 模型的 reverse curse，在 A is B 上训练能否泛化到 B is A
+* 多轮对话，KV cache 的压缩
+* MoE 与 LoRA 的关系, MoE 的 efficiency 
 
 [20231213](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231213.md) 蒸馏方法的局限与 MOE [讨论录像](https://drive.google.com/file/d/11CSgSzk4XCz4Mj7jh1wu0CPpzrDLASnI/view)
 * 当下 self-distill 方法的局限
