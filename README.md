@@ -9,6 +9,12 @@ LLaMafia 关注最扎实的工程和最前沿的科学，所有讨论基于第�
 LLaMafia 研究 AI，是因为纯粹的热爱
 
 ## Tech Log
+[20231220](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231220.md)
+* DPO v.s. RLHF
+* Code force eval LLMs
+* int4 v.s. float4 v.s. fp16 v.s. bf16
+* In-context pretraining
+
 [20231217](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231217.md)
 * 模型的 reverse curse，在 A is B 上训练能否泛化到 B is A
 * 多轮对话，KV cache 的压缩
