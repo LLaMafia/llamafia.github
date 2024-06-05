@@ -1,0 +1,630 @@
+chat_session_len:16
+用户4:https://yaofu.notion.site/Full-Stack-Transformer-Inference-Optimization-Season-2-Deploying-Long-Context-Models-ee25d3a77ba14f73b8ae19147f77d5e2
+用户4:通信开销最终就只是加了几毫秒的常数，在这里有讨论 https://kipp.ly/transformer-inference-arithmetic/
+用户4:所以这个文章第一件事情是拆分 concurrency, prefilling, decoding 和 context switching 四项基础 metrics
+用户2:如果 70B dense 模型+ 1M 上下文的场景的话 为了减少 latency 则不得不跨DGX机器部署
+通信开销还是有一些的 理论计算能到 30%~ 的时间
+用户3:其实也就是在现在的配置下，机内通信不构成瓶颈，机间互联通信才构成瓶颈
+用户4:我是觉得 distributed attention 不值得 [破涕为笑] 与其硬去部署不如把时间花在 kv cache 上；写完这个文章我的感受是 mlsys 可以硬上但是不会有跨数量级的优化，必须要有模型架构创新
+用户2:是的 我们也觉得优化模型架构更有前景 否则跨机器部署 长文本场景下推理成本太高 部署成本吃不消
+用户4:嗯，真的很亏，你硬部署了也不知道有多少人付费 [破涕为笑]
+用户3:但很难说突破会先出现在硬件层还是软件层，说不定突然就出现了效率很高/成本很低的机器间互联通信硬件？
+用户1:“从传统机器学习到dp再到llm，相同信息量的输出所需要输入的信息量越多”，如果这个假设成立的话，无论模型侧怎么优化，带宽（包括内存带宽，机内通信带宽和机间通信带宽）始终会是bottleneck
+用户3:确实，在目前的标准硬件栈上，机器间互联通信是很贵的，便宜高效的路径基本都还在探索阶段
+用户6:核心问题还是搬内存太慢。 如果不考虑速度，其实现在nvidia的消费级卡，通过共享内存也可以实现相对的大显存，但是这性能太捉鸡，不实用。。。
+用户3:嗯嗯，空间和时间某种意义上是等价的😂
+用户6:你们还记得大明湖畔amd搞的HSA吗？ 异构互连，有点象统一内存的意思了。tinybox就用这种技术互联。当然还是绕不过PCIE的带宽问题。。。
+用户6:不得不承认，ｎｖｉｄｉａ目前的这种方案还是最优解。。。
+用户5:good luck siri
+
+================================================================================
+chat_session_len:8
+用户8:[强][强][强]好用
+用户6:#群内小活动，盲猜OAI下周一要发布啥
+
+1. gpt 2 chatbot
+2. Agent
+3. VLM
+4. 交互式游戏
+5. Sora access
+6. Ilya的产品(的确很盲的猜)
+7. reasoning capability ++
+8. sora的互动版
+9. 非DIT结构的视频生成模型
+10. 互动式AI搜索引擎
+11. Alignment
+12. AI-powered search engine
+13. 4.5
+14. Align
+15. 4.5+1，voice engine
+16. GPT 4.5 （会降价
+17. LLM OS
+18. Code Agent
+19. Speech
+用户7:#群内小活动，盲猜OAI下周一要发布啥
+
+1. Agent
+2. gpt 2 chatbot
+3. VLM
+4. 交互式游戏
+5. Sora access
+6. Ilya的产品(的确很盲的猜)
+7. reasoning capability ++
+8. sora的互动版
+9. 非DIT结构的视频生成模型
+10. 互动式AI搜索引擎
+11. Alignment
+12. AI-powered search engine
+13. 4.5
+14. Align
+15. 4.5+1，voice engine
+16. GPT 4.5 （会降价
+17. LLM OS
+18. Code Agent
+19. Robot
+20. Speech
+21. audio generation model & tuned for video BGM
+用户3:请问测ICL现在有都有什么popular benchmark啊
+用户2:感谢群主支持～在这里推荐一个创业活动，对标硅谷的AGI house/ latent space～奇绩潜空间系列活动每周会邀请学者/创业者做前言分享，杨植麟、Tony Zhao、Ziming Liu、Jesse（Rabbit R1）、吴翼，名额有限欢迎报名～
+用户4:#群内小活动，盲猜OAI下周一要发布啥
+
+1. gpt 2 chatbot
+2. Agent
+3. VLM
+4. 交互式游戏
+5. Sora access
+6. Ilya的产品(的确很盲的猜)
+7. reasoning capability ++
+8. sora的互动版
+9. 非DIT结构的视频生成模型
+10. 互动式AI搜索引擎
+11. Alignment
+12. AI-powered search engine
+13. 4.5
+14. Align
+15. 4.5+1，voice engine
+16. GPT 4.5 （会降价
+17. LLM OS
+18. Code Agent
+19. Robot
+20. Speech
+21. audio generation model & tuned for video BGM
+22. DAN
+用户5:#群内小活动，盲猜OAI下周一要发布啥
+
+1. gpt 2 chatbot
+2. Agent
+3. VLM
+4. 交互式游戏
+5. Sora access
+6. Ilya的产品(的确很盲的猜)
+7. reasoning capability ++
+8. sora的互动版
+9. 非DIT结构的视频生成模型
+10. 互动式AI搜索引擎
+11. Alignment
+12. AI-powered search engine
+13. 4.5
+14. Align
+15. 4.5+1，voice engine
+16. GPT 4.5 （会降价
+17. LLM OS
+18. Code Agent
+19. Robot
+20. Speech
+21. audio generation model & tuned for video BGM
+22. DAN
+23. 智能硬件
+用户1:#群内小活动，盲猜OAI下周一要发布啥
+
+1. Agent
+2. gpt 2 chatbot
+3. VLM
+4. 交互式游戏
+5. Sora access
+6. Ilya的产品(的确很盲的猜)
+7. reasoning capability ++
+8. sora的互动版
+9. 非DIT结构的视频生成模型
+10. 互动式AI搜索引擎
+11. Alignment
+12. AI-powered search engine
+13. 4.5
+14. Align
+15. 4.5+1，voice engine
+16. GPT 4.5 （会降价
+17. LLM OS
+18. Code Agent
+19. Robot
+20. Speech
+21. audio generation model & tuned for video BGM
+22. DAN
+23. 智能硬件
+24. 4.25
+
+================================================================================
+chat_session_len:26
+用户4:谢谢金特
+用户13:请问下大家，目前有工作考虑 LLM 完成传统的英<->中 翻译的问题么？体感上比较好的翻译模型有推荐么？做了个简单的实验，不过测试 ChatGPT3.5 和 deepseek V2 的体验，感觉没有明显区别，翻译腔也很浓 🤔
+用户1:@ㅤPinzhen-Edinburgh-LLM 有
+用户13:偏慢了些 😂 而且体感上也比较翻译腔
+用户13:翻译一些ML论文
+用户3:给个example看看？ 4的翻译腔不重的吧
+用户12:《缓存与效果的极限拉扯：从MHA、MQA、GQA到MLA》
+https://kexue.fm/archives/10091
+
+本文简单概率了多头注意力的演变历程，特别是从MHA向MQA、GQA，最终到MLA的变化理念，最后详细展开了对MLA的介绍。在本文中，MLA被视为GQA的一般化，它用投影矩阵的方式替代了GQA的分割、重复，并引入了一个恒等变换技巧来可以进一步压缩KV Cache，同时采用了一种混合方法来兼容RoPE。
+
+https://mp.weixin.qq.com/s/Qj6suFdEnP5_OQhYQGvxKg
+用户13:谢谢大家，我先换个 prompt 试试看 😂
+用户2:一个技巧是让跟gpt说“太西化了，太生硬了”然后再修改一遍译文[旺柴]
+用户13:谢谢大家建议~
+用户2:考虑使用dspy优化few-shot示例[旺柴]
+用户2:似乎是常识了
+用户7:推理成本的估计我刚才新写了一版测算方式，大概是 8x80G 机器上，DeepSeekV2 可以开 batch size 16K，LLaMa3 只能开到 batch size 1536
+用户7:一般就是 TP2/4 这种，TP8 可能 allreduce 会慢
+用户9:@罗福莉-DeepSeek(hiring)-LLM 
+
+看了一下Deepseek的report，很赞！有个问题，为啥query用的是一个separate matrix (W^{DQ})来降维，而不是和KV一样用同一个matrix（我指的是W^{DKV}）？升维投影W^{UK}，W^{UQ}，W^{UV}都不一样，所以应该没有对称性上的问题（我指的是Q和K应当不对称）。
+
+另外有没有考虑过不升维，直接在latent space c上做self-attention？原则上如果self-attention可以low-rank，并且操作是inner product的话，完全不需要升维投影W^{UK}，W^{UQ}，W^{UV}...
+用户7:这个 93% 是怎么来的呢？
+用户7:按照 DeepSeek-67B 估计，应该是   60*2.25/(95*8) = 0.18，因此节省的 kvcache 应该是 82%？
+用户10:脑子炸了，慢慢一个个来回复哈
+用户14:FYI: https://sites.google.com/view/ngsmworkshop
+用户7:感谢感谢
+用户6:6bit？上混合精度了？
+用户6:哦哦哦，不好意思，我以为是单比kv-cache
+用户10:具体到KV cache为啥6bits，大家探索吧～
+用户5:gsm8k，是不是和math的评测有冲突，一个升，另一个降
+用户8:@苏剑林 苏神，这块得加一个重要原因，就像@成诚-Skywork-AI Infra 说的主要增加了batch size，可以提升吞吐吧？
+用户12:好，我微调一下表述
+
+================================================================================
+chat_session_len:81
+用户3:对标gpt4o吗[旺柴]
+用户19:有个问题想讨论下，lima 这种方式少量指令就能达到效果，但是yi 1.5已经用3M指令数据。我认为这东东本质上点类似fewshot, 少量样本可以达到一定效果，类似2/8定律，但是要达到较好的效果，还是要足够量的指令数据。不知道大家怎么看？
+用户8:他们今天刚发的
+用户8:虽然我也感觉和去年那个什么chameleon3没啥区别的样子。。。
+用户13:DeepSeek lite 版本：https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite-Chat
+
+@罗福莉-DeepSeek(hiring)-LLM [ThumbsUp]
+用户13:想问一下 lite 版本是彻底 from scratch 训练的吗
+用户16:我更新下readme吧
+用户13:那 alignment 阶段有使用 full 版本作为 RM 一类的吗
+用户13:感谢开源[抱拳]
+用户16:没有，DeepSeek-V2-Lite-Chat是只SFT的模型（我们想把MoE上的RL问题留给大家探索～）
+用户2:@罗福莉-DeepSeek(hiring)-LLM 你们HF上没有放model license，可以放一下吗？
+https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite-Chat
+用户2:你们的model license是可以商用的吗？
+用户2:请教一下video understanding现在最好的开源模型是哪个啊？
+用户16:我们开源了一个总参数16B，激活2.4B的DeepSeek-V2-Lite，40G可部署，8*80G可微调，方便大家一起魔改MLA，共同完善vllm等推理代码哈： https://huggingface.co/deepseek-ai/DeepSeek-V2-Lite-Chat
+用户5:deepseek的license确实是真.OSS [旺柴]
+用户10:感谢开源, 方便做很多事了 [鼓掌]
+用户19:按传统软件的观点看，现在的所谓开源模型其实只是免费模型。传统开源软件允许 使用者从头构建软件，语言模型的训练数据一般是不开放的。当然，即使开放，大家也没资源 自己训练 一个。所以有人建议不用开源这个说法，改为开放权重模型。 通常只有模型配套代码是开源的，模型权重只是开放免费使用。
+用户17:这里的问题是从头的“头”应该怎么定义
+用户7:现在的开源模型更像是试用体验套装，大模型公司不可能像传统软件的开源一样把数据链路 infra软件 训练细节全给你了。
+用户19:模型是主体，用户没数据可以自行从头构建。
+用户19:从头：from scratch
+用户11:baichuan之前发过一个ckp版本的的模型包
+用户11:算是给了训练细节了
+用户17:还是那句话，从头的头是什么，你完全开放了代码，但有些代码实现非常巧妙，我完全想不到，所以对我来说是不是要手把手教会我怎么想到这样写才算是从头？
+用户19:不是教，是给。
+用户19:刚才也说了，大模型有特殊性，全给也不定有条件重现。所以，改称开放权重模型更妥。
+用户5:我觉得能 open weight 已经很不错了
+any contributions towards open LLMs should be appreciated
+咋称呼并不重要 [破涕为笑]
+用户17:现在开放了权重，你可以自行二次微调来构建自己的模型，也可以完全不微调直接使用，你只是不知道权重怎么来的，我理解就相当于说你不理解这个代码是怎么想到可以写得这么简洁的
+用户17:就算开放了数据，你也不知道数据怎么来的，还有怎么清洗的
+用户19:传统软件的从头是这样：所有可运行的最终文件都要从编译器之类的工具得到。
+用户5:因为企业能放出模型 他们自己也是 take了legal risk的 也不容易
+用户17:总可以无限往后推下去
+用户15:[旺柴]也有从头给的，可以看看我们的MAP-Neo
+用户15:https://huggingface.co/collections/m-a-p/neo-models-66395a5c9662bb58d5d70f04
+用户15:而且performance并不是很拉胯
+用户15:略胜llama-2
+用户5:（BigCode 也fully release 了生产资料
+用户19:如果拿图片比作模型，源应该是psd之类工程文件，有设计痕迹，易于修改。
+用户1:事实上怎么定义「开源」还是由「开源」的人决定的[旺柴]
+用户19:个人理解的开源模型至少是这样：至少提供同比例的部分训练数据，方便增量训练（修改模型）。这只是个人理解。在大模型开源这件事上，10个人心中有10个哈里波特。对开放模型的公司表达敬意。
+用户7:传统软件开源就是说从数据爬取和清洗的工具和方法 到训练的infra软件 再到训练调参技巧 以及模型结构和权重全部开源[捂脸]
+主打一个第三方可复现（不考虑算力）
+用户17:我是从开源的目的来理解的，开源的目的就是为了能够自由地修改
+用户17:权重相当于一段magic code
+用户17:我开源没理由还要教会你magic code怎么想到的
+用户4:那cluster定制化的software也得开吧，cluster design也得开
+用户4:大模型甚至跟你的集群设计有关系
+用户4:不是很现实
+用户11:授人以鱼和渔，其实训练方案目前看才是核心资产，比如yi
+用户11:都反编译了，还开源啊
+用户7:用半开源描述可能更恰当 比如NV的很多软件就是半开源
+GPU算子核心代码只有二进制 但是上层API和主体架构都是开源的
+正好对应了权重开源 方案不开源
+用户19:二进制patch ，binary本质上是机器码（包括虚拟机代码），可以人工修改，当然看水平。
+用户19:另一角度谈这个问题：传统软件开源主打全流程可见，llm这种模型生成是黑箱。
+用户19:打开一个传统软件源码，所有细节尽现。大模型是有很多未公开的东西，即使开放权重也有秘密。
+用户19:这可能是一个明显的区别。
+用户15:诚征进一步资助算力让我们搞MoE版本的[害羞]
+用户15:我听说类似harvard，stanford，thu其实有些lab是训得起的[旺柴]。之前苏大什么的不是也训过MindLLM之类的。
+用户1:@胡声鼎 清华 scaling/data
+用户15:1.3B其实从头训也能做些，如果从一个好的baseline开始也能给不少insights了吧
+用户15:现在肯定只有很少的机构能训得起，但是算力应该是会越来越便宜吧
+用户4:[捂脸]
+用户4:理财产品
+用户15:再次厚脸皮advertise我们的模型，Neo是一个在这个阶段足够好但是依旧有超级多改进空间的baseline，欢迎大家fork我们的repo，然后在Neo这个基础上做些东西和改进：
+https://github.com/multimodal-art-projection/MAP-NEO
+用户15:我们拉了个user group
+用户15:我们这周在加班加点做alignment和tech report，any thoughts或者想知道的detail，我们都可以写在tech report里
+用户17:256卡训1个月
+用户17:2t tokens
+用户17:llama2的paper里边有gpu hours数据
+用户5:这个 scale 并不是说你有 N 倍卡 
+就能快 N 倍 local的 throughput / gpu 肯定还是最快
+用户17:7b级别，在fsdp之下还是接近线性的scale
+用户17:怎么也不至于32个月变6个月…
+用户11:有线眼镜的话，产品形态还不是很完整
+用户19:眼镜有个问题，电池：要持续联网，而且还得是蜂窝网络，电池消耗很快。
+用户6:大家有没有碰到过，使用上百台机器训练时，全部使用时机器通信出问题，但是单拿一个集群时，没有问题的情况
+用户6:感觉是集群与集群之前网络通信的问题，不知道有没有大佬清楚的
+用户18:是不是有些机器之间没法互相ping通？
+用户12:这一百多台机器不在一个 pod 里么
+用户6:一百多台不在一个集群里面
+用户12:这没法训的，IB 互相 ping 不通，没法建立通信
+用户14:请教一个问题哈，ROPE是具备远程衰减的性质，也没有可训练参数，各层embedding其实也适配过了，为什么相对距离T不能泛化到2T呢？
+用户17:归根结底就是attention没有长度外推能力
+用户17:NoPE都不行（反正我复现不出来）
+
+================================================================================
+chat_session_len:7
+用户2:在 repoqa 上浅测了一下最近的新模型 “御三家”居然打平了 [破涕为笑]
+用户2:https://evalplus.github.io/repoqa.html
+用户1:看到一个基于llama3的sota开源模型smaug，把我们的ExPO方法用在上面做了增强，欢迎大家试用：
+https://huggingface.co/chujiezheng/Smaug-Llama-3-70B-Instruct-ExPO
+用户1:目前还没卡整评测，希望有富哥来帮测测[让我看看]
+用户1:上面这个是70b的模型。还有另一个llama3-8b的增强模型，是基于@熊伟 UIUC/Google alignment agent @Haoxiang Wang-UIUC-RLHF 之前做的，这个测了下有提升，也欢迎大家试用：
+https://huggingface.co/chujiezheng/LLaMA3-iterative-DPO-final-ExPO
+用户3:https://arxiv.org/abs/2405.10938
+用户4:FYI: https://skywritingspress.ca
+
+================================================================================
+chat_session_len:68
+用户19:@黄文灏-baai-llm 牛逼的
+用户28:感谢群主。老实说，分数有点超预期了，不过模型能力在这个范围和我们自己的评测还比较接近。这个版本还比较粗糙，看看之后能不能再迭代一版。
+用户21:欢迎大家来交流体验 yi large preview （更欢迎随时反馈badcase[害羞]）
+用户3:Yifia和Qwenia哪个先到[旺柴]
+用户21:目前只有api [撇嘴]
+用户6:[强][强][强]
+用户26:那就只有蹲一版技术报告了。
+用户5:https://arxiv.org/abs/2405.11143 做了点微不足道的活，被大佬们带了[旺柴]（欢迎大家多提提建议和意见）。此外， 也欢迎大家多关注：https://github.com/OpenLLMAI/OpenRLHF，为开源社区做做共享。
+用户15:OpenRLHF 真的好用[ThumbsUp]
+尤其是基于Ray的PPO
+用户5:[社会社会]
+用户5:前两位大佬做了比较多的贡献
+用户15:想问一下是开源社区自发组织起来的吗？
+因为看到作者来自于3 个不同的公司
+用户15:而且我们发现 OpenRLHF ppo 训练的稳定性比其他框架好很多
+是因为参考了这些 ppo 的问题性 trick 吗？
+https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
+用户15:TRLX 和 deepspeed-chat
+用户17:我试过TRL的PPO，确实有问题，主要还是一些设置问题
+用户15:或者换种说法, openRLHF 是 off-the-shelf 框架里面最稳定的，集成了很多稳定性 trick，开箱即用
+用户6:@初七-NVIDIA-LLM [旺柴]
+用户15:[强]久仰
+用户14:Copilot 🤝 Minecraft
+Your everyday AI companion.
+https://x.com/MSFTCopilot/status/1792625882634281231
+用户14:powered by OpenAI’s GPT-4o，低延迟、高交互性的优势很明显
+还得是 GPT-4o，这体验很丝滑啊
+用户25:这种会不会太费tokens
+用户14:感觉应该比前几天 GPT-4o 发布会的那个耗费 tokens 好一些。
+那个视频处理，是要逐帧转化成图片的 tokens 的，比较费 tokens。
+
+但在 MC 里的视频处理是个可选项，可以从 game core 里提取很多结构化信息。
+用户22:我在GAU上的实验结果是alibi和nope的外推能力为0
+用户22:比rope还差
+用户17:迟一些，我总结一下。
+用户24:https://arxiv.org/abs/2401.16421，我们最近做了这个(ICML 2024）感兴趣的同学也可以看看
+用户2:@沈炜-南京大学- hulu 谢谢，给你点关注发言了
+用户27:打个广告：我们将在icml2024办一个long context foundation models (LCFM)的workshop，欢迎各位大佬投稿/来玩。投稿截止是5.31aoe，详见https://longcontextfm.github.io
+用户27:感觉本群对long-context感兴趣的密度极高[奸笑]
+用户23:非常感兴趣 多模态最重要的基建能力之一[旺柴]
+用户3:[旺柴]
+用户10:到时候关注一下 long-context 挺有意思的
+用户17:deepspeed stage 3 有没有同学使用这个在8卡上微调过deepseek code 33B 效果好像比 deepspeed stage 2差了好多，😂
+用户7:效果指的是？
+用户7:训练速度嘛
+用户7:那个肯定慢很多了
+用户17:我说最终的模型测试效果
+用户17:不是速度
+用户7:没做过对比，但这不应该有很大的区别吧[破涕为笑]
+用户10:不应该升级下版本看看
+用户17:哦哦哦，我再准确测试一下
+用户19:什么是 in context learning
+用户26:以前也没有人分啥cot/ ICL, 就是提示学习。后来给细分了
+用户19:4o 还可以
+用户12:测了其他几个，表现会有断层下降
+用户3:这跟tokenize关系极大😂
+用户3:训练tokenizer的数据选的subset不同分词都会有差异吧，还要考虑人工调整的部分[发抖]
+用户3:https://x.com/shinboson/status/1792420144511431099?s=46 今天看这个帖子讨论怎么提升算术性能，分词对算术影响还是非常大的，调整格式避免错误分词能提升很多性能
+用户8:分词的影响我记得之前有一篇论文已经讨论过：https://arxiv.org/abs/2305.14201
+用户9:是不是可以用Experience Replay的方法，训练模型
+用户19:好奇有没有什么地方考虑让模型今年同步参加高考 🤔
+用户19:以现在的模型能力，参加高考应该没有任何技术上做不了的地方了吧
+用户1:高考题目实时给模型公司有安全性问题吧
+用户19:考完的那一瞬间给是可以的吧
+用户1:应该没问题
+用户20:记得以前很多年都有AI参加高考的新闻
+用户4:考完的瞬间是可以的 不过高考打分还有蛮多主观的因素在，比如作为河北考生就还挺卷字体和卷面整洁的 不知道现在有没有什么办法可以公平比较
+用户8:这个我记得已经有了吧，就是复旦那边之前就测过，选择题的
+用户20:GAOKAO-Bench
+用户4:好像都是 选择题之前
+用户18:化学、物理里面涉及到读图的题（这些图没法转述为文字而不损失关键信息）对模型挑战挺大的，不知道国内 sota 的多模态模型到啥程度了
+用户20:[让我看看] 缺的解答题，可以用 OlympiadBench 里的五三高考模拟题子集
+用户20:比较经典的这道题，GPT4V能识别出是墨西哥湾流
+用户18:嗯嗯，4 确实不错。但不知道国内的有没有“视力”和“脑力”都很好的了
+用户11:GLM4不错的[旺柴]
+用户19:贵群其实可以自发组织一下
+用户19:高考的卷子一般考完当天网上就有了
+用户16:感觉可能也就客观题比较有办法...占比很高的大题，比如作文（语文 & 英语），理综和数学的大题（过程中间哪步到哪步能给多少分），非事实性阅读理解（语文出这种题可能比较多，比如体会作者的感情和用意，结合（古文）的时代背景分析等等，英语这边完形填空等偏事实性的还是多一点），既不见得好打分，也不见得好做（有的时候不是model能力的问题，而是这类题可能主观性太强或者“出题人意图难以理解”）
+
+================================================================================
+chat_session_len:55
+用户14:2022 年湖南卷数学选择题
+用户14:GPT 4o 八个对了五个
+用户1:其他模型是什么水平？
+用户14:不知道啊，手动截图复制粘贴好累，贴不动了
+用户11:万群，请问下，现在关于 参考音频+参考文本 翻译成 对应音色+语言的新音频，有推荐的开源项目嘛
+用户4:是时候构建Gaokaoagent了
+用户7:能上重本线吗（）
+用户7:那上清华无望了（）
+用户8:孩子得复读了
+用户14:大家不要着急看我直播
+用户4:hackathon题目——构建数学能考140的agent
+用户14:还有五个题目，还有机会
+用户14:现在做到解答题第二题了
+用户14:但是这是一道几何题，我是觉得有点难的
+用户4:解三角形更多是代数变换[旺柴]
+用户13:嗯，我每次复现结果不稳定
+用户14:算它得 3 分好了
+用户13:理论上来说是不是应该做24年的高考卷比较合理
+用户14:24 年不是还没出嘛
+用户13:对，所以到时候和人类同步高考一下
+用户13:因为我和fuyao老师居然搜到了同一套卷子给gpt4o做🤔
+用户14:总共是 单选 25 / 40 + 多选 10 / 20 + 填空 0 / 20 + 大题 21 / 70 = 56 / 150
+用户4:留学生zero shot这个成绩不错了[旺柴]
+用户13:英语 语文应该很好？理综试试[偷笑]
+用户2:还得考俩小时
+用户4:不懂套路可能连中考题都做不出来
+用户15:文理的数学
+用户5:也许要求它用中文做成绩还会好一点
+用户14:今年高考，也就是一个月之后，如果要考的话，可以给 ta in-context learning，把前五年的真题作为 in-context example
+用户14:或许 open compass 的朋友会有兴趣搞一搞？ 
+用户18:拉一波进群
+用户4:instruction和reflection应该能改善一些成绩
+用户5:我的chatgpt考场上手写python代码 好奇真有考生这么弄老师怎么判[破涕为笑]
+用户14:这个题目如果是正常考生的话是得用函数的方法来比较的
+用户14:但是它硬算了【 btw 一个几百 M 的模型就可以硬算常见函数的数值了
+用户14:但是人肯定没办法硬算
+用户5:人应该也可以泰勒硬算？
+用户15:貌似不太会用最简单的方式做题
+用户14:嗯，整个下来我觉得它总是倾向于使用复杂方式解题
+用户14:参考答案比它简单得多
+用户14:complexity based prompting 就是容易把简单问题带复杂
+用户16:Actually，4o推KL的non-negativity，也是不必要的复杂化了
+用户15:https://arxiv.org/pdf/2402.14008 
+我们当时在OlympiadBench上做多模态和文本模型实验时，有一些有趣的发现，例如 模型选择复杂的解题过程；结论幻觉；过程引入不必要的概念等
+用户14:https://x.com/liambolling/status/1792992186411430244?s=46&t=CKI7n9G54Thts9rTrC1n0Q
+用户10:这么一说我想起来了，我之前在ttic学information theory的时候，我的老师好像就是jensen推的
+用户17:啊我没感觉哪一步是不必要的啊
+用户17:反正我感觉这个过程挺本质的，统计里面很多跟kl相关的bound也是拿p/q当随机变量的
+用户3:Phi-3 Medium (14B) 发布了：https://huggingface.co/microsoft/Phi-3-medium-4k-instruct
+用户4:https://arxiv.org/pdf/2301.03728
+有人读过这篇关于多模态的 scaling law 的工作吗，为什么 Uni-modal 的 scaling law 力 他们说 molecules 对 scale 的利用很充分？看图似乎 molecules 的 PPL 随scale变化不大啊
+用户6:各位好，受邀在国内某顶尖高校合作开大模型方面的通识课程，想给大学生们多一些接触国际最前沿的知识的机会。现在召集AI专家Guest Speaker一些AI主题（远程线上讲座即可），仿照百家讲坛形式。我们争取开百人到千人的大课。有兴趣的请私我，感谢！
+用户9:gpt4 是 5x10^25 左右
+用户12:其实比较好奇怎么做到无法在某些知识上被finetune
+用户4:调整模型神经元模式，碰到这些知识就mode collapse，或者植入后门[脸红]
+用户10:感觉这个政策的制定也挺一拍脑门的
+用户10:如果我们大胆想象五年以后的算力和模型的发展，这感觉regularize不了什么...
+
+================================================================================
+chat_session_len:38
+用户1:Mistral v0.3在HuggingFace放出来了（没有细节），有人测过benchmark分数了吗？
+用户9:才上传 8 小时 x
+用户9:哪里有 v0.2 的 score 呀
+用户9:虽然 MATH 单靠自然语言已经被刷到 80+ 了，但一般的model要正确率比较高还是要靠 code，请问有群友知道有什么 framework 执行这种自然语言+code夹杂的 generation pipeline 比较高效吗？
+用户11:chain-of-symbol prompting
+用户9:太强啦！我看看
+用户9:但目前最好的应该还是类似 Code Interpreter 这种模式
+用户4:我没get 😂
+用户9:纯 code 就是程序输出作为答案，Code Interpreter 就是程序输出会加回 context 然后 LLM 继续 reasoning
+用户9:感觉会涉及到很多异步？想请问熟悉vLLM的朋友，vLLM的异步实现相比一般的模式效率会有区别吗🤔
+用户2:langchain可以做么？公司内部有一个自己的类langchain lib叫onetwo，做你这个需求很方便，但不知道third party版体验如何
+用户9:稍微想了一下，感觉关键就是大量异步操作
+用户9:自己鼓捣一下应该也不难
+用户4:[破涕为笑] 你是说 如果是 python 的话 或许通过 streaming 来 async 的执行 python statements 吗 :P
+用户9:想想好像也不复杂？但如果有现成的当然是最好啦
+用户9:希望尽量把GPU和CPU都打满
+用户2:onetwo就是把async包的很好，其他的没什么特别的，llm call和code interpreter都被抽象成engine/agent这种形式了，langchain如果也是这样的话应该也可以支持
+用户2:我有体验过实现alphago那种形式的mcts，llm call和cpu computation都heavy的那种，写起来蛮舒服
+用户9:可以的可以的
+用户9:感谢解答！
+用户9:感觉就是一些agent framework比较可能会有这种功能
+用户6:因为llm走的是gpu，然后编译执行那块是cpu，可能想想优化的是让cpu和gpu都跑满吧
+用户9:两边要相互等待
+用户3:好像理解了，是有些优化空间，比如 LM 写完一句code就执行一句[旺柴]
+用户3:我有个大胆的想法，用GPU执行Python
+用户5:我以为是lm输出code后交付执行，若干cot step后再拿结果修正之前推理
+用户9:嗯，但是如果想大规模搜索就比较有用了
+用户3:起码省了IO[旺柴]
+用户9:笑死[旺柴][旺柴]
+用户10:going 2000
+用户3:https://github.com/HigherOrderCO/Bend
+其实现在有一些 PoC 是在干这个事的，未来可能所有计算都可以在 GPU 上完成了
+用户3:普通计算里也存在并行的空间
+用户9:[天啊][天啊]学到了
+用户9:感觉async这部分是简单的
+用户9:麻烦的是把code的输出加到context里，是不是会打乱vllm对kvcache的调度。印象里vllm目前还不支持中途插入context
+用户3:sglang能不能派上用场
+用户7:大佬们怎么看待这篇：Your Transformer is Secretly Linear
+https://arxiv.org/abs/2405.12250
+用户8:https://docs.google.com/forms/d/e/1FAIpQLSeL20BzIA0MT-8n3KnheQqEPQ448vVjXJh-shswidiymo1q8g/viewform 请大家积极参与neurips review [合十]
+
+================================================================================
+chat_session_len:42
+用户13:https://papers.cool/arxiv/2405.14828
+24年了，good seed 还是 all you need [捂脸]
+用户6:@熊伟 UIUC/Google alignment agent 你们的 Iterative DPO 实现的时候是纯 offline 的嘛 先生成 然后走rm 然后 DPO 和 RS 一样?
+用户1:你说的offline包括多次迭代rm吗
+用户1:反正就是 生成response 用rm标一下 训练policy，循环几次，没有更新rm
+用户6:就是 rm不是常驻内存 就离线标注
+用户10:可以不常驻内存的
+用户7:我感觉用 RM 打，其实不如人快速标一遍[捂脸]
+用户7:反正都是彻底离线在跑了
+用户1:llama和claude他们结合了用人和rm
+用户1:用人还是贵吧
+用户7:RM 感觉还是会有hacking 的问题，最典型的还是那个倾向长文本或某些 hacking phrase
+用户1:hacking不光是rm的问题，其实我们测过BT rm的verbosity bias并没有大家想象中那么严重。一个几乎没有verbosity bias的rm在训练过程中也会明显变长。另外就是即使是ground truth rm也会有“hacking”，例如math即使有gt 答案，所以hacking更多是在optimization过程中导致的。rm跟人工标比还是能省不少人力
+用户2:我们训练了很多Reward Models - 体感是现在高质量preference data不够多（覆盖的distribution不够广），所以经常OOD generation比较差 / 或者学到了一些spurious correlation（比如URL这种reward hacking）
+用户3:URL是什么意思
+用户3:只靠这么少的信号监督学到spurious correlation太正常了
+用户2:感觉哪家公司能多放一些人类标注的preference data（比如HelpSteer这种），对这个领域的提升会很大
+用户3:就跟用cnn识别狗的品种发现在识别背景颜色一样[旺柴]
+用户3:需要high dimensional reward
+用户3:需要对齐可能说明预训练的分布就是不对齐期望分布的，那么对齐是不是icing on the cake，只是选取一小部分分布调整其形状，终归是覆盖不完全的
+用户5:所以就是离线的，分不同训练阶段
+用户5:（如果我没遗漏代码细节，@初七-NVIDIA-LLM 
+用户5:get，rm的训练数据处理，和ppo/dpo时候加惩罚，是目前比较常见的做法
+用户1:嗯，我们试过数据比loss好用。尽管math上差不多😂
+用户12:提问🙋 gpt4o 符合大家的预期吗
+用户4:响应速度超出预期🤔
+用户12:唔，还是看整体聪明程度
+用户4:中文多模ocr比之前聪明
+用户3:https://huggingface.co/spaces/Jellyfish042/UncheatableEval
+压缩能力榜单
+用户9:今天试了一下语音通话，好像实时打断的功能没了？
+用户4:举个简单的例子[捂脸] 这样的图片给他ocr+reasoning
+用户9:感觉中文的语音对话能力没有超过我的预期，首先实时语音对话好像无了，然后问题复杂了，推理时间好像会增加？
+用户11:这个榜是RWKV发的
+用户11:说用dolma准备更多的训练data……
+用户14:dolma不太行
+用户14:之前和EleutherAI的人说过，dolma不太行，可能是没听进去？
+用户11:而且新数据和uncheatable没什么关系，略微调整下分布想让谁在上面就谁在上面吧[捂脸]
+用户8:说到ocr，前几天测了一下，gemini advanced ocr latex的内容有点不太行，表格会容易读串行，有朋友知道这种用mmlm做ocr/table的benchmark么？感觉有点意思
+用户8:gpt4o中文表格图片那识别有点惨
+用户3:看起来gemini注意力有些涣散
+用户8:看了一下串行串列读错数字都有(
+用户8:(突然感觉也不能说multi-modal真的被解决了，就算是native support)
+用户8:按我的理解，ocr这个task都做了好多年了我拿adobe的识别都不见得会做的这么差
+
+================================================================================
+chat_session_len:43
+用户7:话说投票要不要加一个选做题，让大家把觉得有趣的case写上来🤔
+用户7:[666]有道理
+用户4:llamafia poll 成为继chatbot arena 后第二可用eval
+用户7:[破涕为笑][捂脸]llamafia arena？…
+用户7:话说4o体感有时候懒 有些case勤快 不知道大家有没有遇到🤔
+用户7:参照是4v 4turbo
+用户11:gpt4o推理速度很赞
+用户11:要是能更快就更好了，快到每打一个字符都自动出答案那种
+用户8:纯文本我发现逻辑推理能力比gpt-4-turbo强，deductive/abductive reasoning
+用户8:我最近在搞一个logic reasoning的synthetic data，gpt-4o的performance在相对简单的reasoning题目上比gpt-4能高 10%，f1在80%左右，gpt-4-turbo是在70%左右
+用户15:code和翻译都不太行
+用户16:确实，试了一下之后还是选择claude写code
+用户16:总不能以后Gemini搞long-context，claude搞code，其他情况gpt-4[旺柴]，三足鼎立
+用户16:我搞visualization的code感觉sonnet理解我的intent的情况总比gpt4o/turbo多，写出来直接能跑看起来pleasant的概率也更高(我基本也是用ai来干这个事，我自己画图太差了
+用户10:嗯嗯 肯定是在不同 coding domain 上有不同的 perf
+用户12:请问有比较好的xai的paper reading list可以推荐的吗？
+用户9:gemini1.5我感觉现在能用一点了 虽然复杂一点的指令还是去听不懂
+用户9:当时速度好快 各种给它数据，画图画表格
+用户16:现在确实比1.0好多了
+用户16:1.0...哎也不知道为什么发布这个版本
+用户14:有一个问题没想明白，既然同样效果的模型，moe训练和使用成本更低，同样成本训练moe效果更好，是不是大多数情况下都应该训练moe模型？为啥像llama等一直在搞dense模型，咋没有训练moe模型呢？
+用户13:你们也说了是同样的active param, 那整个部署系统中的MoE多出的参数量也是算成本的, 在不同的部署场景里面, 它也不是完成胜于dense的. 所有的前提都在于你服务可以打到算力上限.
+用户13:当然, llama的选择我同样抱有疑问, 只能说有可能他们在探上限
+用户4:然后蒸馏吗[旺柴]
+用户2:现在的moe基本上只能和两倍active params的模型效果差不多
+用户2:我个人是感觉moe做了这么多年还是没做得很work
+用户2:sparse优化的问题还是需要基础理论的突破
+用户1:MoE从91年Michael Jordan和Hinton他们提出来已经三十多年了，架构其实一直没什么大变化
+用户12:而且基本都是Google在solo
+用户1:对，前些年主要是Google那边工程上把MoE给Scale up上去了
+用户1:过去一年由GPT4引爆了MoE的研究新热潮 - 但我没看到什么理论上的新的切入点
+用户2:https://arxiv.org/abs/2310.00811
+用户12:感觉从理论上看，moe比较像是深层次/更复杂的model ensemble
+用户6:想问一下群友，有没有一些文章实验证明了长序列训练确实能提升模型性能
+用户6:有没有sequence维度的scaling law之类的[旺柴]
+用户5:https://manifestai.com/articles/compute-optimal-context-size/
+用户6:NB，我看一下
+用户3:这个测试还挺有启发性的
+用户3:不是简单的大海捞针
+用户17:这个似乎和babilong有点像？
+用户17:相当于把一个多跳推理题的n个condition拆开洒进去
+用户4:像 Chameleon 这种pretrain阶段就 mixed-modal 的建模方式，可能会有什么单独 训练不同模态再 encode 输入语言模型的方式所不具备的能力？比如多模态的上下文学习，可以很轻松解决的人物一致性🤔
+用户18:到目前为止贵群和 twitter 对于 gpt4o 的看法类似
+
+================================================================================
+chat_session_len:3
+用户2:请问有百川的同学吗？可否帮忙联系一下这篇paper https://papers.cool/arxiv/2405.14591 的作者，对齐一下细节。我自己的数值计算结果不大对得上论文的结果
+用户1:我联系你哈
+用户2:好的，谢谢，已经联系上
+
+================================================================================
+chat_session_len:50
+用户4:现在有视频理解模型能把里面不同技术和油耗的下降提取出来吗👀
+用户17:冒昧请问下大家，有没有类似 BBH NI 的中文数据集推荐呢，我这边找到 COIG 这个数据集，但是感觉对于单条 instruction，这个数据集的 examples 不太多的？
+用户13:我可以来解决下
+用户7:请教一下，群里有大佬搞过H卡的FP8训练吗，稳定性和效率如何呀，之前跟NV的人交流说还比较难落地训练，不知道现在进展如何了
+用户16:《Transformer升级之路：18、RoPE的底数设计原则》
+https://kexue.fm/archives/10122
+
+本文简单介绍了论文《Base of RoPE Bounds Context Length》，它从语义聚合的期望性质讨论了RoPE的底数下界，由此指出更大的训练长度应该选择更大的底数，而不单单是为了配合“先短后长”的训练策略、继而利用NTK-RoPE来降低初始损失的折中选择。
+
+https://mp.weixin.qq.com/s/-PKvDf7HO82gr3tONY1-gQ
+用户14:谢谢@苏剑林 的详细解读和分享，这个工作还有很多局限性，不过还是希望对RoPE的分析以及后续对长窗口上的扩展能有一些借鉴的意义。现在这个RoPE里面base的下界还是数值解，有兴趣的同学朋友可以试试能不能求出来解析解[呲牙]欢迎都与我们沟通哈
+用户18:https://arxiv.org/abs/2405.16684#:~:text=Past%20work%20has%20established%20scaling,of%20a%20fixed%20compute%20budget.
+用户18:data-dependent scaling law
+用户15:提问：大家觉得 7b 的模型在两年之后，效果能 match 今天 100b 的模型吗 🤔
+用户1:效果是指知识的储量还是回答问题的准确性
+用户1:如果是后者，我觉得有可能
+用户4:两年前的 GPT3 175b 和现在的 llama3 8b[旺柴]
+用户4:知识的储量其实还是有很大的优化空间，无论是绝对容量还是有用知识的存量
+用户10:如果成立，意味着未来做端侧模型的公司会很多，杨老师也算提前去踩路了
+用户4:knowledge scaling law 里面谈到在不同domain的数据前面加区分domain的tag就能增加30%的知识容量，感觉这种low hanging fruit 可能还有很多
+用户15:我感觉现在电脑起步 8G 完全是为了搞价格歧视弄钱
+用户3:我想提个可能有点naive的问题，我看语言模型都是B级的，sam这种视觉模型只有几百M，是因为视觉数据信息量更少吗同样的scale下
+用户15:我用 ollama 跑 7b 模型的时候，常驻内存是 16G 往上，于是我 24G 内存的 mac 就刚好能跑，但我比较难想象如果只有 16G 显存应该怎么跑端侧模型
+用户5:这时候apple的统一内存架构就香起来了
+用户5:话说我4090跑7B 大约是5-6g常驻 是因为🤔
+用户5:默认量化吗
+用户18:单纯的视觉模型不需要推理吧
+用户12:一个不需要推理的判别模型和大生成模型 非常不一样
+用户12:sora这种也是需要推理的生成模型 也是B级
+用户18:生成模型为啥需要参数多
+用户15:因为生成[破涕为笑]
+用户18:我记得MAE里encoder比decoder大？
+用户3:因为要学分布？
+用户3:mae说了他们的decoder是lightweight
+用户12:因为生成需要model uncertainty
+用户15:在翻译和摘要这俩任务上，for a very long time 大的 encoder 被认为比 decoder 更重要的
+用户15:最初代用 pretrained LM 做 summarization 的文章是在 bert 上面架一个 rnn 做 decoding https://arxiv.org/pdf/1903.10318
+用户4:数据量越多，架构越简化也只能更简化
+用户15:我的印象里是一直到 2022 下半年，大家才意识到当 decoder 大了之后，它本身 encode 的能力就跟 encoder 一样了；decoder 也能 encode 应该是 yet another 典型的小 scale 不成立，但大 scale 就成立的例子
+用户3:Interesting
+用户18:现在主流的VLM都是用SigLip这种特别小的模型encode
+用户4:bpe 是一种encoder
+用户18:sry，开源vlm
+用户6:不太清楚现在一般大家都是怎么做的
+用户6:bert时候可以拿［CLS］token当作input的representation，因为pretraining有相关的task
+用户4:mixtral也搞代码模型了，Codestral
+用户3:现在大家多节点训练用的比较多的架构是fsdp吗
+用户5:小模型fsdp效率足够高
+用户10:你觉得这种设备会有多大的出货量？有多少正常人会替换智能手机用ai手机？
+用户11:encoding能力的测试还是挺抽象的，大概有两类，一类是token/sentence classification，一类是retrieval
+用户11:reward model有scaling law吗
+用户9:还是 openai 的
+用户11:hh，刚刚也搜到了
+用户18:or decoder only model
+用户2:说明有额外训练的话，decoder only模型用last token的表示完全ok
+
+================================================================================
