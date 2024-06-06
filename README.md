@@ -1,4 +1,6 @@
-# llamafia.github
+# 🎩 LLaMafia
+
+> "LLaMA + Mafia -> LLaMafia" 🌟 
 
 LLaMafia 是一个中文前沿 AI / LLM 开源讨论空间。LLaMa 指 [LLaMA 模型](https://en.wikipedia.org/wiki/LLaMA)， Mafia 指[极客群体](https://en.wikipedia.org/wiki/PayPal_Mafia)，合起来叫 LLaMafia
 
@@ -8,7 +10,14 @@ LLaMafia 关注最扎实的工程和最前沿的科学，所有讨论基于第�
 
 LLaMafia 研究 AI，是因为纯粹的热爱
 
-## Tech Log
+## 🧵 Table of Contents
+
+- [🧵 Table of Contents](#-table-of-contents)
+- [🗃️ Tech Log](#-tech-log)
+- [🌟 Star History](#-star-history)
+- [📧 Contact](#-contact)
+
+## 🗃️ Tech Log
 [20231220](https://github.com/LLaMafia/llamafia.github/blob/main/Log/20231220.md)
 * DPO v.s. RLHF
 * Code force eval LLMs
@@ -65,6 +74,10 @@ LLaMafia 研究 AI，是因为纯粹的热爱
 * 压缩得越好，模型越有可能恢复数据的生成过程
 * 为什么智能是一种副产物：过度优化的问题
 
-## Contact
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=LLaMafia/llamafia.github&type=Date)](https://star-history.com/#LLaMafia/llamafia.github&Date)
+
+## 📧 Contact
 
 llamafia.agi@gmail.com
